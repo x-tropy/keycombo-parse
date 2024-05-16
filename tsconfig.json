@@ -1,0 +1,8 @@
+{
+	"compilerOptions": {
+		"declaration": true,
+		"outDir": "./dist" // Output directory for compiled JavaScript and declaration files
+		// Other compiler options...
+	},
+	"include": ["./src"] // Path to your TypeScript source files
+}

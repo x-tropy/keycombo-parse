@@ -1,0 +1,26 @@
+{
+	"name": "keycombo-parse",
+	"version": "1.0.0",
+	"description": "Use an easy-to-read key combo string to capture keyboard events. For example: `⇧ ⌥ ⌘ + K` → `e.shiftKey && e.altKey && e.metaKey && e.code === 'KeyK'`",
+	"main": "/dist/index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/x-tropy/keycombo-parse.git"
+	},
+	"keywords": [
+		"keyboard",
+		"keycombo",
+		"shortcut",
+		"hotkey",
+		"keyboardEvent"
+	],
+	"author": "extropy.dev",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/x-tropy/keycombo-parse/issues"
+	},
+	"homepage": "https://github.com/x-tropy/keycombo-parse#readme"
+}
