@@ -31,6 +31,9 @@ function parseKeyComboEvent(e) {
     return { contentKey: contentKey, modifierKeys: modifierKeys };
 }
 function contentKeyMapper(code) {
+    if (code.split(" ").length > 1) {
+        throw new Error("Invalid code");
+    }
     code = code.toLowerCase();
     switch (code) {
         case "keyq":
@@ -191,28 +194,38 @@ function contentKeyMapper(code) {
         case "⇥":
             return "tab";
         case "escape":
+        case "esc":
             return "esc";
         case "backspace":
         case "⌫":
+        case "delete":
+        case "del":
             return "del";
         case "enter":
+        case "return":
         case "⏎":
         case "↵":
         case "↩":
             return "enter";
         case "arrowup":
         case "↑":
+        case "up":
             return "up";
         case "arrowdown":
         case "↓":
+        case "down":
             return "down";
         case "arrowleft":
         case "←":
+        case "left":
             return "left";
         case "arrowright":
         case "→":
+        case "right":
             return "right";
         case "capslock":
+        case "caps":
+        case "cap":
         case "⇪":
             return "cap";
         default:
@@ -221,8 +234,24 @@ function contentKeyMapper(code) {
 }
 function parseKeyComboString(s) {
     s = s.toLowerCase();
-    var parts = s.split("+");
-    var modifierKeys = parts[0]
+    if (s.indexOf("+") !== -1) {
+        var parts = s.split("+");
+        var modifierKeys = extractModifiers(parts[0]);
+        var contentKey = contentKeyMapper(parts[1].trim());
+        return { contentKey: contentKey, modifierKeys: modifierKeys };
+    }
+    if (allModifiers.every(function (m) { return s.indexOf(m) === -1; })) {
+        // No modifiers
+        return { contentKey: contentKeyMapper(s), modifierKeys: [] };
+    }
+    else {
+        // Only modifiers
+        var modifierKeys = extractModifiers(s);
+        return { contentKey: "", modifierKeys: modifierKeys };
+    }
+}
+function extractModifiers(s) {
+    return s
         .split(" ")
         .filter(function (p) { return p !== ""; })
         .map(function (modifier) {
@@ -247,9 +276,8 @@ function parseKeyComboString(s) {
                 throw new Error("Unknown modifier: ".concat(modifier));
         }
     });
-    var contentKey = contentKeyMapper(parts[1].trim());
-    return { contentKey: contentKey, modifierKeys: modifierKeys };
 }
+var allModifiers = ["ctrl", "control", "⌃", "shift", "⇧", "alt", "option", "⌥", "cmd", "command", "meta", "⌘"];
 function deepEqual(a, b) {
     return a.contentKey === b.contentKey && deepEqualArray(a.modifierKeys, b.modifierKeys);
 }
@@ -266,4 +294,4 @@ function deepEqualArray(a, b) {
     }
     return true;
 }
-// console.log(keyCombo("⇧ ⌃ ⌥ ⌘ + Q", { ctrlKey: true, shiftKey: true, altKey: true, metaKey: true, code: "KeyQ" } as KeyboardEvent))
+// console.log(keyCombo("⇧ ⌃ ⌥ meta + Q", { ctrlKey: true, shiftKey: true, altKey: true, metaKey: false, code: "KeyQ" } as KeyboardEvent))

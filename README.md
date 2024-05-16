@@ -19,12 +19,10 @@ The key combination string: `⇧ ⌥ ⌘ + C`, is quite succinct, but might be h
 A few things to note:
 
 - We use space as separator, so spaces are necessary
-- We recognize `alt` rather than `option`
-- We recognize `meta` rather than `command`
-- We recognize `ctrl` rather than `control`
+- We recognize `alt`, `option`, or `⌥`, all supported!
 - We avoid differentiating modifier keys on the right side, so `ShiftLeft` and `ShiftRight` are treated as the same
 - Case-insensitive, so `Alt` and `alt` are both acceptable
-- It's recommended that key combination always end with a non-modifier key, for example: `+ C`, `+ 1`, or `+ [`
+- It's recommended that key combination always end with a non-modifier key, for example: `⌘ + C`, `⌘ + 1`, or `⌘ + [`
 - A single non-modifer key are supported only when user not typing into a text field
 - A single modifer key: `shift`, `alt`, `meta`, `ctrl` are also supported
 - Function keys are not supported

@@ -35,6 +35,9 @@ function parseKeyComboEvent(e: KeyboardEvent): KeyCombo {
 }
 
 function contentKeyMapper(code: string): string {
+	if (code.split(" ").length > 1) {
+		throw new Error("Invalid code")
+	}
 	code = code.toLowerCase()
 	switch (code) {
 		case "keyq":
@@ -236,8 +239,26 @@ function contentKeyMapper(code: string): string {
 
 function parseKeyComboString(s: string): KeyCombo {
 	s = s.toLowerCase()
-	const parts = s.split("+")
-	const modifierKeys = parts[0]
+
+	if (s.indexOf("+") !== -1) {
+		const parts = s.split("+")
+		const modifierKeys = extractModifiers(parts[0])
+		const contentKey = contentKeyMapper(parts[1].trim())
+		return { contentKey, modifierKeys }
+	}
+
+	if (allModifiers.every(m => s.indexOf(m) === -1)) {
+		// No modifiers
+		return { contentKey: contentKeyMapper(s), modifierKeys: [] }
+	} else {
+		// Only modifiers
+		const modifierKeys = extractModifiers(s)
+		return { contentKey: "", modifierKeys }
+	}
+}
+
+function extractModifiers(s: string): Array<Modifier> {
+	return s
 		.split(" ")
 		.filter(p => p !== "")
 		.map(modifier => {
@@ -262,9 +283,9 @@ function parseKeyComboString(s: string): KeyCombo {
 					throw new Error(`Unknown modifier: ${modifier}`)
 			}
 		})
-	const contentKey = contentKeyMapper(parts[1].trim())
-	return { contentKey, modifierKeys }
 }
+
+const allModifiers = ["ctrl", "control", "⌃", "shift", "⇧", "alt", "option", "⌥", "cmd", "command", "meta", "⌘"]
 
 function deepEqual(a: KeyCombo, b: KeyCombo): boolean {
 	return a.contentKey === b.contentKey && deepEqualArray(a.modifierKeys, b.modifierKeys)
@@ -284,4 +305,4 @@ function deepEqualArray(a: Array<Modifier>, b: Array<Modifier>): boolean {
 	return true
 }
 
-// console.log(keyCombo("⇧ ⌃ ⌥ ⌘ + Q", { ctrlKey: true, shiftKey: true, altKey: true, metaKey: true, code: "KeyQ" } as KeyboardEvent))
+// console.log(keyCombo("⇧ ⌃ ⌥ meta + Q", { ctrlKey: true, shiftKey: true, altKey: true, metaKey: false, code: "KeyQ" } as KeyboardEvent))
