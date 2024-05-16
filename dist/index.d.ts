@@ -1,1 +1,1 @@
-export declare function greet(s: string): string;
+export default function keyCombo(s: string, e: KeyboardEvent): boolean;
