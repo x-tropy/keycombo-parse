@@ -1,34 +1,27 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function keyCombo(s, e) {
-    var keyCombo = parseKeyComboEvent(e);
-    var expectedKeyCombo = parseKeyComboString(s);
+    const keyCombo = parseKeyComboEvent(e);
+    const expectedKeyCombo = parseKeyComboString(s);
     return deepEqual(keyCombo, expectedKeyCombo);
 }
 exports.default = keyCombo;
-var Modifier;
-(function (Modifier) {
-    Modifier["ctrl"] = "ctrl";
-    Modifier["shift"] = "shift";
-    Modifier["alt"] = "alt";
-    Modifier["meta"] = "meta";
-})(Modifier || (Modifier = {}));
 function parseKeyComboEvent(e) {
-    var modifierKeys = [];
+    const modifierKeys = [];
     if (e.ctrlKey) {
-        modifierKeys.push(Modifier.ctrl);
+        modifierKeys.push("ctrl");
     }
     if (e.shiftKey) {
-        modifierKeys.push(Modifier.shift);
+        modifierKeys.push("shift");
     }
     if (e.altKey) {
-        modifierKeys.push(Modifier.alt);
+        modifierKeys.push("alt");
     }
     if (e.metaKey) {
-        modifierKeys.push(Modifier.meta);
+        modifierKeys.push("meta");
     }
-    var contentKey = contentKeyMapper(e.code);
-    return { contentKey: contentKey, modifierKeys: modifierKeys };
+    const contentKey = contentKeyMapper(e.code);
+    return { contentKey, modifierKeys };
 }
 function contentKeyMapper(code) {
     if (code.split(" ").length > 1) {
@@ -235,49 +228,49 @@ function contentKeyMapper(code) {
 function parseKeyComboString(s) {
     s = s.toLowerCase();
     if (s.indexOf("+") !== -1) {
-        var parts = s.split("+");
-        var modifierKeys = extractModifiers(parts[0]);
-        var contentKey = contentKeyMapper(parts[1].trim());
-        return { contentKey: contentKey, modifierKeys: modifierKeys };
+        const parts = s.split("+");
+        const modifierKeys = extractModifiers(parts[0]);
+        const contentKey = contentKeyMapper(parts[1].trim());
+        return { contentKey, modifierKeys };
     }
-    if (allModifiers.every(function (m) { return s.indexOf(m) === -1; })) {
+    if (allModifiers.every(m => s.indexOf(m) === -1)) {
         // No modifiers
         return { contentKey: contentKeyMapper(s), modifierKeys: [] };
     }
     else {
         // Only modifiers
-        var modifierKeys = extractModifiers(s);
-        return { contentKey: "", modifierKeys: modifierKeys };
+        const modifierKeys = extractModifiers(s);
+        return { contentKey: "", modifierKeys };
     }
 }
 function extractModifiers(s) {
     return s
         .split(" ")
-        .filter(function (p) { return p !== ""; })
-        .map(function (modifier) {
+        .filter(p => p !== "")
+        .map(modifier => {
         switch (modifier) {
             case "ctrl":
             case "control":
             case "⌃":
-                return Modifier.ctrl;
+                return "ctrl";
             case "shift":
             case "⇧":
-                return Modifier.shift;
+                return "shift";
             case "alt":
             case "option":
             case "⌥":
-                return Modifier.alt;
+                return "alt";
             case "cmd":
             case "command":
             case "meta":
             case "⌘":
-                return Modifier.meta;
+                return "meta";
             default:
-                throw new Error("Unknown modifier: ".concat(modifier));
+                throw new Error(`Unknown modifier: ${modifier}`);
         }
     });
 }
-var allModifiers = ["ctrl", "control", "⌃", "shift", "⇧", "alt", "option", "⌥", "cmd", "command", "meta", "⌘"];
+const allModifiers = ["ctrl", "control", "⌃", "shift", "⇧", "alt", "option", "⌥", "cmd", "command", "meta", "⌘"];
 function deepEqual(a, b) {
     return a.contentKey === b.contentKey && deepEqualArray(a.modifierKeys, b.modifierKeys);
 }
@@ -287,7 +280,7 @@ function deepEqualArray(a, b) {
     }
     a = a.sort();
     b = b.sort();
-    for (var i = 0; i < a.length; i++) {
+    for (let i = 0; i < a.length; i++) {
         if (a[i] !== b[i]) {
             return false;
         }

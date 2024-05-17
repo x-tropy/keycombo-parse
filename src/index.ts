@@ -4,12 +4,7 @@ export default function keyCombo(s: string, e: KeyboardEvent) {
 	return deepEqual(keyCombo, expectedKeyCombo)
 }
 
-enum Modifier {
-	ctrl = "ctrl",
-	shift = "shift",
-	alt = "alt",
-	meta = "meta"
-}
+type Modifier = "ctrl" | "shift" | "alt" | "meta"
 
 type KeyCombo = {
 	contentKey: string
@@ -17,18 +12,18 @@ type KeyCombo = {
 }
 
 function parseKeyComboEvent(e: KeyboardEvent): KeyCombo {
-	const modifierKeys = []
+	const modifierKeys: Array<Modifier> = []
 	if (e.ctrlKey) {
-		modifierKeys.push(Modifier.ctrl)
+		modifierKeys.push("ctrl")
 	}
 	if (e.shiftKey) {
-		modifierKeys.push(Modifier.shift)
+		modifierKeys.push("shift")
 	}
 	if (e.altKey) {
-		modifierKeys.push(Modifier.alt)
+		modifierKeys.push("alt")
 	}
 	if (e.metaKey) {
-		modifierKeys.push(Modifier.meta)
+		modifierKeys.push("meta")
 	}
 	const contentKey = contentKeyMapper(e.code)
 	return { contentKey, modifierKeys }
@@ -266,19 +261,19 @@ function extractModifiers(s: string): Array<Modifier> {
 				case "ctrl":
 				case "control":
 				case "⌃":
-					return Modifier.ctrl
+					return "ctrl"
 				case "shift":
 				case "⇧":
-					return Modifier.shift
+					return "shift"
 				case "alt":
 				case "option":
 				case "⌥":
-					return Modifier.alt
+					return "alt"
 				case "cmd":
 				case "command":
 				case "meta":
 				case "⌘":
-					return Modifier.meta
+					return "meta"
 				default:
 					throw new Error(`Unknown modifier: ${modifier}`)
 			}
