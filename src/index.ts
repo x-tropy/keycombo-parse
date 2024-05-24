@@ -1,7 +1,28 @@
-export default function keyCombo(s: string, e: KeyboardEvent) {
+export default function isKeyComboMatch(s: string, e: KeyboardEvent) {
 	const keyCombo = parseKeyComboEvent(e)
 	const expectedKeyCombo = parseKeyComboString(s)
 	return deepEqual(keyCombo, expectedKeyCombo)
+}
+
+function capitalize(s: string): string {
+	return s.charAt(0).toUpperCase() + s.slice(1)
+}
+
+export function standardKeyCombo(original: string | KeyboardEvent): string {
+	let kc: KeyCombo
+	if (typeof original === "string") {
+		kc = parseKeyComboString(original)
+	} else {
+		kc = parseKeyComboEvent(original)
+	}
+	let result = ""
+	if (kc.modifierKeys.includes("shift")) result += "⇧ "
+	if (kc.modifierKeys.includes("ctrl")) result += "⌃ "
+	if (kc.modifierKeys.includes("alt")) result += "⌥ "
+	if (kc.modifierKeys.includes("meta")) result += "⌘ + "
+	result += capitalize(kc.contentKey)
+	if (kc.repeat) result += " " + capitalize(kc.contentKey)
+	return result
 }
 
 type Modifier = "ctrl" | "shift" | "alt" | "meta"
@@ -9,9 +30,10 @@ type Modifier = "ctrl" | "shift" | "alt" | "meta"
 type KeyCombo = {
 	contentKey: string
 	modifierKeys: Array<Modifier>
+	repeat?: boolean
 }
 
-function parseKeyComboEvent(e: KeyboardEvent): KeyCombo {
+export function parseKeyComboEvent(e: KeyboardEvent): KeyCombo {
 	const modifierKeys: Array<Modifier> = []
 	if (e.ctrlKey) {
 		modifierKeys.push("ctrl")
@@ -26,7 +48,8 @@ function parseKeyComboEvent(e: KeyboardEvent): KeyCombo {
 		modifierKeys.push("meta")
 	}
 	const contentKey = contentKeyMapper(e.code)
-	return { contentKey, modifierKeys }
+	const repeat = e.repeat ? true : false
+	return { contentKey, modifierKeys, repeat }
 }
 
 function contentKeyMapper(code: string): string {
@@ -155,37 +178,48 @@ function contentKeyMapper(code: string): string {
 			return "9"
 		case "bracketleft":
 		case "{":
+		case "[":
 			return "["
 		case "bracketright":
 		case "}":
+		case "]":
 			return "]"
 		case "minus":
 		case "_":
+		case "-":
 			return "-"
 		case "equal":
 		case "+":
-			return "="
+		case "=":
+			return "+"
 		case "semicolon":
 		case ":":
+		case ";":
 			return ";"
 		case "comma":
+		case ",":
 		case "<":
-			return ","
+			return "<"
 		case "period":
+		case ".":
 		case ">":
-			return "."
+			return ">"
 		case "quote":
+		case "'":
 		case '"':
-			return "'"
+			return '"'
 		case "backquote":
 		case "~":
+		case "`":
 			return "`"
 		case "backslash":
+		case "\\":
 		case "|":
-			return "\\"
+			return "|"
 		case "slash":
 		case "?":
-			return "/"
+		case "/":
+			return "?"
 		case "space":
 		case "␣":
 			return "space"
@@ -199,7 +233,7 @@ function contentKeyMapper(code: string): string {
 		case "⌫":
 		case "delete":
 		case "del":
-			return "del"
+			return "delete"
 		case "enter":
 		case "return":
 		case "⏎":
@@ -209,37 +243,47 @@ function contentKeyMapper(code: string): string {
 		case "arrowup":
 		case "↑":
 		case "up":
-			return "up"
+			return "↑"
 		case "arrowdown":
 		case "↓":
 		case "down":
-			return "down"
+			return "↓"
 		case "arrowleft":
 		case "←":
 		case "left":
-			return "left"
+			return "←"
 		case "arrowright":
 		case "→":
 		case "right":
-			return "right"
+			return "→"
 		case "capslock":
 		case "caps":
 		case "cap":
 		case "⇪":
-			return "cap"
+			return "capsLock"
 		default:
 			return "unknown"
 	}
 }
 
-function parseKeyComboString(s: string): KeyCombo {
+export function parseKeyComboString(s: string): KeyCombo {
 	s = s.toLowerCase()
 
 	if (s.indexOf("+") !== -1) {
 		const parts = s.split("+")
 		const modifierKeys = extractModifiers(parts[0])
-		const contentKey = contentKeyMapper(parts[1].trim())
-		return { contentKey, modifierKeys }
+		const rawContentKey = parts[1].trim()
+		let contentKey
+
+		// detect repeat
+		let repeat = false
+		if (rawContentKey.length === 2 && rawContentKey[0] === rawContentKey[1]) {
+			repeat = true
+			contentKey = contentKeyMapper(rawContentKey[0])
+		} else {
+			contentKey = contentKeyMapper(rawContentKey)
+		}
+		return { contentKey, modifierKeys, repeat }
 	}
 
 	if (allModifiers.every(m => s.indexOf(m) === -1)) {
@@ -283,7 +327,7 @@ function extractModifiers(s: string): Array<Modifier> {
 const allModifiers = ["ctrl", "control", "⌃", "shift", "⇧", "alt", "option", "⌥", "cmd", "command", "meta", "⌘"]
 
 function deepEqual(a: KeyCombo, b: KeyCombo): boolean {
-	return a.contentKey === b.contentKey && deepEqualArray(a.modifierKeys, b.modifierKeys)
+	return a.contentKey === b.contentKey && deepEqualArray(a.modifierKeys, b.modifierKeys) && a.repeat === b.repeat
 }
 
 function deepEqualArray(a: Array<Modifier>, b: Array<Modifier>): boolean {

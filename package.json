@@ -1,10 +1,13 @@
 {
 	"name": "keycombo-parse",
-	"version": "1.0.4",
+	"version": "1.0.6",
 	"description": "Use an easy-to-read key combo string to capture keyboard events. For example: `⇧ ⌥ ⌘ + K` → `e.shiftKey && e.altKey && e.metaKey && e.code === 'KeyK'`",
-	"main": "/dist/index.js",
-	"module": "/dist/index.mjs",
-	"types": "/dist/index.d.ts",
+	"main": "./dist/index.js",
+	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.ts",
+	"files": [
+		"dist"
+	],
 	"scripts": {
 		"test": "jest",
 		"build": "tsup"

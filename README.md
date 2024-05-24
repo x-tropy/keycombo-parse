@@ -23,17 +23,41 @@ The key combination string: `⇧ ⌥ ⌘ + C`, is quite succinct, but might be h
 After installation with `pnpm add keycombo-parse`, you could import it to browser client-side JavaScript code:
 
 ```js
-import keyCombo from "keycombo-parse"
+// using the default export
+import isKeyComboMatch from "keycombo-parse"
 
 document.addEventListener("keydown", e => {
-	if (keyCombo("⇧ ⌥ ⌘ + H", e)) {
+	if (isKeyComboMatch("⇧ ⌥ ⌘ + H", e)) {
 		showHelp()
 	}
 })
 
-function showHelp() {
-	console.log("Help")
-}
+const showHelp() => console.log("Displaying help dialog...")
+```
+
+or get the standardized keycombo string:
+
+```js
+import { standardKeyCombo } from "keycombo-parse"
+
+standardKeyCombo(" cmd shift option + k") // log output: ⇧ ⌥ ⌘ + K
+```
+
+if you want have a shortcut that requires hitting content key twice, define it this way:
+
+```js
+import isKeyComboMatch from "keycombo-parse"
+
+document.addEventListener("keydown", e => {
+	if (isKeyComboMatch("⌘ + C", e)) {
+		copyName()
+	} else if (isKeyComboMatch("⌘ + CC", e)) {
+		copySVG()
+	}
+})
+
+const copyName = () => console.log("Copying icon name...")
+const copySVG = () => console.log("Copying icon SVG...")
 ```
 
 ## Restriction

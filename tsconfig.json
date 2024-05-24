@@ -4,7 +4,7 @@
 		"declaration": true,
 		"outDir": "./dist",
 		"module": "commonjs",
-		"target": "ES6",
+		"target": "ES2016",
 		"strict": true,
 		"esModuleInterop": true
 	},
